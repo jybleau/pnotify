@@ -109,7 +109,7 @@
         clearTimeout(posTimer);
       }
       posTimer = setTimeout(() => {
-        const event = new Event('pnotify:position');
+        const event = new CustomEvent('pnotify:position');
         document.body.dispatchEvent(event);
         posTimer = null;
       }, 10);
@@ -391,11 +391,11 @@
       dispatch(`pnotify:${event}`, eventDetail);
       return true;
     }
-    const eventObj = new Event(`pnotify:${event}`, {
+    const eventObj = new CustomEvent(`pnotify:${event}`, {
       bubbles: event === 'init' || event === 'mount',
-      cancelable: event.startsWith('before')
+      cancelable: event.startsWith('before'),
+      detail: eventDetail
     });
-    eventObj.detail = eventDetail;
     target.dispatchEvent(eventObj);
     return !eventObj.defaultPrevented;
   }
