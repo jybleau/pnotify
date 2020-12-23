@@ -169,11 +169,13 @@
   }
 
   function _createSuper(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
     return function () {
       var Super = _getPrototypeOf(Derived),
           result;
 
-      if (_isNativeReflectConstruct()) {
+      if (hasNativeReflectConstruct) {
         var NewTarget = _getPrototypeOf(this).constructor;
 
         result = Reflect.construct(Super, arguments, NewTarget);
@@ -237,7 +239,7 @@
     if (typeof o === "string") return _arrayLikeToArray(o, minLen);
     var n = Object.prototype.toString.call(o).slice(8, -1);
     if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Map" || n === "Set") return Array.from(o);
     if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
   }
 
@@ -563,7 +565,7 @@
     }
   }
 
-  var globals = typeof window !== 'undefined' ? window : global;
+  var globals = typeof window !== 'undefined' ? window : typeof globalThis !== 'undefined' ? globalThis : global;
 
   function outro_and_destroy_block(block, lookup) {
     transition_out(block, 1, 1, function () {
@@ -3409,7 +3411,7 @@
       }
 
       posTimer = setTimeout(function () {
-        var event = new Event("pnotify:position");
+        var event = new CustomEvent("pnotify:position");
         document.body.dispatchEvent(event);
         posTimer = null;
       }, 10);
@@ -3633,11 +3635,11 @@
         return true;
       }
 
-      var eventObj = new Event("pnotify:".concat(event), {
+      var eventObj = new CustomEvent("pnotify:".concat(event), {
         bubbles: event === "init" || event === "mount",
-        cancelable: event.startsWith("before")
+        cancelable: event.startsWith("before"),
+        detail: eventDetail
       });
-      eventObj.detail = eventDetail;
       target.dispatchEvent(eventObj);
       return !eventObj.defaultPrevented;
     }
